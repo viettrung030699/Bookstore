@@ -1,0 +1,174 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package query;
+
+import java.awt.event.*;
+import java.awt.*;
+
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Timer;
+import javax.swing.JOptionPane;
+import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
+import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
+import static query.GUI.DEFAULT_QUERY;
+
+/**
+ *
+ * @author hvtrung
+ */
+public class CheckIn extends Frame {
+
+    private JLabel labelISBN = new JLabel("ISBN: ");
+    private JLabel labelBook = new JLabel("Book name: ");
+    private JTextField textISBN = new JTextField(20);
+    private JTextField textBook = new JTextField(30);
+    private JButton buttonAdd = new JButton("ADD");
+    private ResultSetTableModel tableModel;
+    public String checkInDate = new SimpleDateFormat("yyyy-MM-dd: hh:mm:ss").format(new Date());
+    public int flag;
+    public long start = System.currentTimeMillis();
+    public CheckIn() {
+        super("CHECK IN BOOK");
+        drawCheckIn();
+    }
+    
+    public long getTimeIn(){
+                 
+                
+                 start = System.currentTimeMillis();
+                return start;
+    }
+    
+    public void drawCheckIn(){
+        JPanel newPanel = new JPanel(new GridBagLayout());
+
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.anchor = GridBagConstraints.WEST;
+        constraints.insets = new Insets(10, 10, 10, 10);
+
+        //add componets to the pannel:
+        constraints.gridx = 0;
+        constraints.gridy = 0;
+        newPanel.add(labelISBN, constraints);
+
+        constraints.gridx = 1;
+        newPanel.add(textISBN, constraints);
+
+        constraints.gridx = 0;
+        constraints.gridy = 1;
+        newPanel.add(labelBook, constraints);
+
+        constraints.gridx = 1;
+        newPanel.add(textBook, constraints);
+
+        constraints.gridx = 0;
+        constraints.gridy = 2;
+        constraints.gridwidth = 2;
+        constraints.anchor = GridBagConstraints.CENTER;
+        newPanel.add(buttonAdd, constraints);
+
+       
+         
+        //When OK is pushed: timer =0:00 
+        buttonAdd.addActionListener(
+                new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent event) {
+
+                if (textISBN.getText() != null && textBook.getText() != null) 
+                {
+                            String date = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(new Date());
+                            
+
+                            JFrame f = new JFrame("Check In Process");
+                            JLabel label = new JLabel();
+                            label.setText("Check In Time: "+date);
+                            
+                            label.setBounds(20, 20,300, 80);
+                            f.add(label);
+                            JButton b = new JButton("OK");
+        b.setBounds(80, 100, 80, 80);
+        f.add(b);
+        f.setSize(300,400);
+        f.setLayout(null);
+        f.setVisible(true);
+        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        
+        b.addActionListener(
+                new ActionListener(){
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    flag =1;
+                                    f.setVisible(false);
+                                    setVisible(false);
+                                    CheckOut checkout = new CheckOut(checkInDate);
+                                    checkout.run();
+                                }
+                    
+                }
+        );
+                }
+                else {
+                    // print new frame 
+                    JFrame f1 = new JFrame("Message");
+                    JLabel label1 = new JLabel();
+                    label1.setText("Please Try Again!");
+                    label1.setBounds(20,20,160,80);
+                    f1.add(label1);
+                    f1.setSize(200,150);
+                    f1.setLayout(null);
+                    f1.setVisible(true);
+                    f1.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                }
+            }
+
+        }
+        );
+        addWindowListener(
+                new WindowAdapter() {
+                    public void windowClosed( WindowEvent event ){
+                        tableModel.disconnectFromDatabase();
+                        System.exit( 0 );
+                    }
+                }
+        );
+        
+         //set Border for the panel
+        newPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Check In"));
+        add(newPanel);
+        pack();
+        setLocationRelativeTo(null);
+
+    }  
+    public void run(){
+            try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                new CheckIn().setVisible(true);
+            }
+        });
+    }
+}

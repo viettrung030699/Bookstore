@@ -1,0 +1,43 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package query;
+
+/**
+ *
+ * @author hvtrung
+ */
+public class CheckingProcess {
+    
+        public CheckingProcess(){
+            
+        }
+        public void check(){
+            CheckIn checkin = new CheckIn();
+            String checkindate = checkin.checkInDate;
+            CheckOut checkout = new CheckOut(checkindate);
+            checkout.run();
+        }
+        public static void main(String[] args){
+        int temp;
+        CheckIn c = new CheckIn();
+       String a = c.checkInDate;
+        temp = c.flag;
+      //if flag == 0 then checkIn 
+      //else checkOut
+        if(c.flag ==0){
+       c.run();
+        }
+       else if(c.flag== 1)
+        {
+            CheckOut c1 = new CheckOut(a);
+            c1.run();
+         
+        }
+        
+        
+      
+        }
+}

@@ -1,0 +1,188 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package query;
+
+import java.awt.event.*;
+import java.awt.*;
+
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Timer;
+import javax.swing.JOptionPane;
+import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
+import static org.eclipse.persistence.expressions.ExpressionMath.mod;
+import static org.eclipse.persistence.expressions.ExpressionOperator.mod;
+import static query.GUI.DEFAULT_QUERY;
+
+/**
+ *
+ * @author hvtrung
+ */
+public class CheckOut extends Frame {
+
+    private JLabel labelUsername = new JLabel("Username: ");
+    private JLabel labelISBN = new JLabel("Book ISBN: ");
+    private JTextField textISBN = new JTextField(30);
+    private JTextField textUSERNAME = new JTextField(30);
+    private JButton buttonCheck = new JButton("Check");
+    private String checkOutDate = new SimpleDateFormat("yyyy-MM-dd: hh:mm:ss").format(new Date());
+    private String checkInDate;
+    public int flag = 1;
+    public long end = System.currentTimeMillis();
+    public CheckOut(String time) {
+        super("Check Out Book");
+        drawCheckOut();
+        this.checkInDate = time;
+        
+    }
+
+    public void drawCheckOut() {
+        JPanel newPanel = new JPanel(new GridBagLayout());
+
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.anchor = GridBagConstraints.WEST;
+        constraints.insets = new Insets(10, 10, 10, 10);
+
+        //add componets to the pannel:
+        constraints.gridx = 0;
+        constraints.gridy = 0;
+        newPanel.add(labelUsername, constraints);
+
+        constraints.gridx = 1;
+        newPanel.add(textUSERNAME, constraints);
+
+        constraints.gridx = 0;
+        constraints.gridy = 1;
+        newPanel.add(labelISBN, constraints);
+
+        constraints.gridx = 1;
+        newPanel.add(textISBN, constraints);
+
+        constraints.gridx = 0;
+        constraints.gridy = 2;
+        constraints.gridwidth = 2;
+        constraints.anchor = GridBagConstraints.CENTER;
+        newPanel.add(buttonCheck, constraints);
+
+        //Check Button:
+        buttonCheck.addActionListener(
+                new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+
+                if (textUSERNAME.getText() != null && textISBN.getText() != null) 
+                {
+                    
+                    
+                    JFrame f = new JFrame("Check Out Process");
+                    JLabel label = new JLabel();
+                    label.setText("Check Out Time: " + checkOutDate);
+                    Calendar timeout = Calendar.getInstance();
+                    label.setBounds(20, 20, 300, 80);
+                    f.add(label);
+                    JLabel label1 = new JLabel();
+                    label1.setText("Check Out Time: " + checkInDate);
+                    label1.setBounds(20, 40, 300, 80);
+                    f.add(label1);
+                    
+                    JButton buttonOK = new JButton("OK");
+                    buttonOK.setBounds(10, 100, 80, 80);
+                    f.add(buttonOK);
+                    JButton buttonCancel = new JButton("Cancel");
+                    buttonCancel.setBounds(210,100,80,80);
+                    f.add(buttonCancel);
+                    f.setSize(300, 400);
+                    f.setLayout(null);
+                    f.setVisible(true);
+                    f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                    //Button OK: show the message about the fee of renting book
+                    buttonOK.addActionListener(
+                            new ActionListener(){
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            int flag = 0;
+                            CheckIn checkin = new CheckIn();
+                             long timein = checkin.getTimeIn();
+                             long timeout = System.currentTimeMillis();
+                             long diff = timeout - timein;
+                             long fee = 5;
+                            //Counting money for rent
+                             if(diff ==0) //Dont rent anything
+                                fee =0;
+                            else if(diff < 86400000) //rent on day
+                                fee = 5;
+                            else{
+                                long remainder = diff % 86400000;
+                                fee += ((diff - remainder) / 86400000)*10;
+                            }
+                                JOptionPane.showMessageDialog(checkin, "Your account lost "+fee, "Annoucement", HEIGHT);
+                            
+                            
+                            
+                            f.setVisible(false);
+                            setVisible(false);
+                        }
+                            }
+                    );
+                    
+                    
+                }
+                else
+                {
+                    // print new frame 
+                    JFrame f1 = new JFrame("Message");
+                    JLabel label1 = new JLabel();
+                    label1.setText("Please Try Again!");
+                    label1.setBounds(20,20,160,80);
+                    f1.add(label1);
+                    f1.setSize(200,150);
+                    f1.setLayout(null);
+                    f1.setVisible(true);
+                    f1.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                }
+            }
+
+        }
+        );
+        
+          //set Border for the panel
+        newPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Check Out"));
+        add(newPanel);
+        pack();
+        setLocationRelativeTo(null);
+
+    }
+
+    public void run() {
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                new CheckOut(checkInDate).setVisible(true);
+            }
+        });
+    }
+    
+    }
+
+
