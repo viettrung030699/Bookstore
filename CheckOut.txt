@@ -97,7 +97,7 @@ public class CheckOut extends Frame {
                     label.setBounds(20, 20, 300, 80);
                     f.add(label);
                     JLabel label1 = new JLabel();
-                    label1.setText("Check Out Time: " + checkInDate);
+                    label1.setText("Check In Time: " + checkInDate);
                     label1.setBounds(20, 40, 300, 80);
                     f.add(label1);
                     
@@ -122,15 +122,15 @@ public class CheckOut extends Frame {
                              long timeout = System.currentTimeMillis();
                              long diff = timeout - timein;
                              long fee = 5;
+                             long remainder = diff % 86400000;
                             //Counting money for rent
-                             if(diff ==0) //Dont rent anything
-                                fee =0;
-                            else if(diff < 86400000) //rent on day
-                                fee = 5;
-                            else{
-                                long remainder = diff % 86400000;
-                                fee += ((diff - remainder) / 86400000)*10;
-                            }
+                             if(remainder  == 0) //Dont rent anything
+                             {
+                                 fee += (diff / 86400000) * 10;
+                             }
+                             else{
+                                 fee += 10 + (diff/86400000) * 10;
+                             }
                                 JOptionPane.showMessageDialog(checkin, "Your account lost "+fee, "Annoucement", HEIGHT);
                             
                             
